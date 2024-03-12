@@ -5,16 +5,28 @@
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 ![dependencies status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen)
 
+## 🖊 Info
+### Example render of the ContainerGym environment during evaluation
+<p align="center">
+<img src= "https://github.com/Pendu/ContainerGym_Prefinal/blob/2c3589ef8c90c77832ccc0808fc7aafa6eec1713/example.gif" width="80%" height="80%"/>
+</p>
 
 ## 📚 Setup
+### Pre-requisites
+* Python >=3.8.0,<3.10
+* Conda
+### Install conda
+```{bash}
+bash Anaconda-latest-Linux-x86_64.sh
+```
 
 ## 🤖 Installation
 
 Clone the repository and run the following.
 
 ```{bash}
-git clone https://anonymous.4open.science/r/ContainerGymSubmission
-cd ContainerGym
+git clone https://github.com/Pendu/ppo_paper_draft.git
+cd ppo_paper_draft
 ```
 
 Create a conda virtual environment and run the following commands
