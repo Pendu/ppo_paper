@@ -92,11 +92,10 @@ from utils.inference_plotting import plot_local_inference
 from utils.train_custom_policies import CustomPPO
 
 
-
-# -----------------------------------------------------------------------------
-
 def train(seed, args, shared_list):
+    
     args = args
+    
     # get the actual bunker-id from args.bunkers (indices)
     bunker_names = bunker_ids(args.bunkers)
 
@@ -113,18 +112,10 @@ def train(seed, args, shared_list):
     for i in args.NA_Pf:
         NAPf_prefix = NAPf_prefix + str(i) + "_"
 
-        # run_name = f"{prefix}p_{args.number_of_presses}_el_{args.max_episode_length}_b_{args.total_timesteps}_g_{args.gamma}_nst_{args.n_steps}_NAVf_{args.NA_Vf[0]}_{args.NA_Vf[1]}_NAPf_{args.NA_Pf[0]}_{args.NA_Pf[1]}_bs_{args.batch_size}_mr_{args.use_min_rew}_mulmo_s_{seed}"
-
-        #         run_name = f"{prefix}p_{args.number_of_presses}_el_{args.max_episode_length}_b_{args.total_timesteps}_g_{args.gamma}_nst_{args.n_steps}_NAVf_{NAVf_prefix}NAPf_{NAPf_prefix}bs_{args.batch_size}_mr_{args.use_min_rew}_kl_{args.target_kl}_mulmo_s_{seed}_15to23init_{args.ent_coef}_{args.filename_suffix}"
         prefix = "11B"
 
         run_name = f"{prefix}p_{args.number_of_presses}_el_{args.max_episode_length}_b_{args.total_timesteps}_NAVf_{NAVf_prefix}NAPf_{NAPf_prefix}_bs_{args.batch_size}_kl_{args.target_kl}_s_{seed}_{args.filename_suffix}"
 
-    # run_name =  f"_presses_{args.number_of_presses}_seed_{args.seed}"
-
-    # create log dir
-    # log_dir = './logs/'+ args.exp_name + '_'+ run_name+ '/'
-    # log_dir = './logs/c1-30/' + run_name + '/'
     log_dir = args.log_dir + run_name + '/'
 
     log_dir_statevar = log_dir + 'statevar/'
@@ -138,20 +129,6 @@ def train(seed, args, shared_list):
     print(log_dir)
     print(log_dir_statevar)
 
-    # log the parameters onto tensboard
-    # writer = SummaryWriter(f"runs/{run_name}")
-    # writer.add_text(
-    #     "hyperparameters",
-    #     "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])),
-    # )
-    # writer.close()
-
-    # seeding
-    #     random.seed(args.seed)
-    #     np.random.seed(args.seed)
-    #     torch.manual_seed(args.seed)
-    #     torch.backends.cudnn.deterministic = args.torch_deterministic
-    #     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
     # create and wrap the environment
     max_episode_length = args.max_episode_length
@@ -162,20 +139,7 @@ def train(seed, args, shared_list):
                    args.use_min_rew,
                    args.number_of_presses,
                    args.CL_step)
-    
-    
-    #env = gym.make("CartPole-v1")
 
-
-    # env = make_vec_env(lambda: env, n_envs=4, monitor_dir = log_dir)
-
-    # env = VecMonitor(env, log_dir, info_keywords=("action", "volumes"))
-
-    # logs will be saved in log_dir/monitor.csv
-    # if verbose_logging:
-    #     env = Monitor(env, log_dir, info_keywords=("action", "volumes"))
-    # else:
-    #     env = Monitor(env, log_dir)
 
     # Function to create environment and wrap it with Monitor
     def make_env(rank):
@@ -263,114 +227,32 @@ def train(seed, args, shared_list):
                     #lr_schedule= lambda _: 0.0,
                     #clip_range= lambda _: 0.0,
                     )
-            
-        #model = PPO("MlpPolicy", env, verbose=1)
-
-        
-    # print("Activation function:", model.policy.activation_fn)
-
-    # model = PPO("MultiInputPolicy", env, verbose=0,seed=seed,gamma=args.gamma,tensorboard_log=tensorboard_log,n_steps=args.n_steps)
-
-    #     model = PPO(CustomActorCriticPolicy,
-    #                 env,
-    #                 seed=seed,
-    #                 verbose=0,
-    #                 ent_coef=args.ent_coef,
-    #                 gamma=args.gamma,
-    #                 # n_steps=args.n_steps,
-    #                 # tensorboard_log="./ppo_sutco_tensorboard/"
-    #                 tensorboard_log=tensorboard_log,
-    #                 policy_kwargs = config["policy_kwargs"]
-    #                 )
-
-    # log_dir_BC = "./Behavioural_Cloning/artificial/PTC1-20_C1-30_C1-60_C1-70_C1-80_p_2_el_200_b_100000_g_0.99_nst_2048_NAVf_64_64_NAPf_64_64_bs_64_mr_True_mulmo_s_0/best_model.zip"
-    # log_dir = "./aerorew/C1-20_p_1_el_100_b_1000000_g_0.99_nst_2048_NAVf_64_64_NAPf_64_64_bs_64_mr_True_kl_None_mulmo_s_3_autosavecallback1knot5klikebefore_18to25init_imbalanceloss_entcoef_0.0_withfullaerorew_newgaussian/best_model.zip"
-
-    # log_dir_temp = "./aerorew_1/C1-20_C1-30_C1-60_p_1_el_13_b_500000_g_0.99_nst_2048_NAVf_64_64_NAPf_64_64_bs_64_mr_True_kl_0.01_mulmo_s_0_15to23init_0.0_0press_fixbonus_retrained/best_model.zip"
-
-    # log_dir_temp = "./aerorew_1/C1-20_C1-30_C1-60_p_1_el_13_b_100000_g_0.99_nst_2048_NAVf_64_64_NAPf_64_64_bs_64_mr_True_kl_None_mulmo_s_0_15to23init_0.0_0press_allsamepeaks_actspac2/best_model.zip"
 
     seed = seed
-
-    # log_dir_temp = f'prefinal_mulbunk_2/C1-20_C1-30_C1-60_C1-70_C1-80_p_2_el_13_b_1000000_NAVf_512_NAPf_512__bs_64_kl_None_s_{seed}_0press_30ts_imabalanceppo_custpeaks_5b2penv_alsoinf/best_model.zip'
-
-    # log_dir_temp = f'prefinal_mulbunk_2/11b2p/C1-20_C1-30_C1-40_C1-60_C1-70_C1-80_C2-10_C2-20_C2-60_C2-70_C2-80_p_2_el_30_b_1500000_NAVf_512_NAPf_512__bs_64_kl_None_s_{seed}_60press_30ts_c2-20-35-restreal_hugenegfor40/best_model.zip'
-
-    # log_dir_temp = f'prefinal_mulbunk_2/11b2p/step2/0to30init/C1-20_C1-30_C1-40_C1-60_C1-70_C1-80_C2-10_C2-20_C2-60_C2-70_C2-80_p_2_el_1500_b_1000000_NAVf_512_NAPf_512__bs_64_kl_None_s_{seed}_30ts_c2-20-32_origrw_normalpress_step2_oto30init/best_model.zip'
-
-    # log_dir_temp = f'prefinal_mulbunk_2/11b2p/step1/unimolowerpeaksforfew_easyrew/redu_actionspace/C1-20_C1-30_C1-40_C1-60_C1-70_C1-80_C2-10_C2-20_C2-60_C2-70_C2-80_p_2_el_25_b_500000_NAVf_512_512_512_512_NAPf_512_512_512_512__bs_64_kl_None_s_{seed}_0press_30ts_Umo_lowpeaksfew_easyR_sigm_redu_actionspace_step1_closetopeakinit_continue/best_model.zip'
-    # log_dir_temp = f'prefinal_mulbunk_2/11b2p/C1-20_C1-30_C1-40_C1-60_C1-70_C1-80_C2-10_C2-20_C2-60_C2-70_C2-80_p_2_el_1500_b_200000_NAVf_512_NAPf_512__bs_64_kl_None_s_{seed}_60press_30ts_c2-20-35-restreal_hugenegfor40_step2pipeline/best_model.zip'
-
-    # log_dir_temp = f'prefinal_mulbunk_2/5b2p/C1-20_C1-30_C1-60_C1-70_C1-80_p_2_el_13_b_1500000_NAVf_1024_NAPf_1024__bs_64_kl_None_s_{seed}_60press_30ts_realpeaks/best_model.zip'
-
-    # log_dir_temp = f'prefinal_mulbunk_2/11b2p/step1/unimolowerpeaksforfew/redu_actionspace/C1-20_C1-30_C1-40_C1-60_C1-70_C1-80_C2-10_C2-20_C2-60_C2-70_C2-80_p_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_0press_30ts_Umo_lowpeaksfew_sigm_redu_actionspace_step1_closetopeakinit_nsteps_6144_25xdistrew/best_model.zip'
-
-    # log_dir_temp = f'prefinal_mulbunk_2/11b2p/step1/unimolowerpeaksforfew/redu_actionspace/C1-20_C1-30_C1-40_C1-60_C1-70_C1-80_C2-10_C2-20_C2-60_C2-70_C2-80_p_2_el_25_b_1200000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_2_0press_30ts_Umo_lowpeaksfew_sigm_redu_actionspace_step1_closetopeakinit_nsteps_6144_step1a_cost_0.1_num_actions/best_model.zip'
-
-    # log_dir_temp = f'prefinal_mulbunk_2/11b2p/step1/unimolowerpeaksforfew/redu_actionspace/11Bp_2_el_600_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_0_normalPandRW_60ts_nsteps_6144_simplerew_step2/best_model.zip'
-
-    # log_dir_temp = f'prefinal_mulbunk_2/11b2p/step1/unimolowerpeaksforfew/redu_actionspace/11Bp_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_0press_30ts_Umo_lowpeaksfew_sigm_redu_actionspace_step1_closetopeakinit_nsteps_6144_simplerew_+-1.0_load0.1costseed2_neg0.1_0.1cost/best_model.zip'
-
-    # log_dir_temp = f'prefinal_mulbunk_2/11b2p/step1/unimolowerpeaksforfew/redu_actionspace/11Bp_2_el_600_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_normalPandRW_60ts_nsteps_6144_simplerew_step2_run2/best_model.zip'
-
-    # if args.CL_step == 1:
-    #     log_dir_temp = None
     
     if args.CL_step == 1.5:
         log_dir_temp = f"prefinal_mulbunk_5.5/11b2p/step1/11Bp_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_step1/best_model.zip"
 
     if args.CL_step == 2:
-        # log_dir_temp = f'prefinal_mulbunk_3/11b2p/step1/unimolowerpeaksforfew/redu_actionspace/11Bp_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_0press_30ts_Umo_lowpeaksfew_sigm_redu_actionspace_step1_closetopeakinit_nsteps_6144_25xdistrew_repeat/best_model.zip'
-        #log_dir_temp = f'trained_models/step1/11Bp_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_step1/best_model.zip'
         log_dir_temp = f'prefinal_mulbunk_5.5/11b2p/step1.5/run2/11Bp_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_step1.5_run2/best_model.zip'
 
     elif args.CL_step == 3:
-        # log_dir_temp = f'prefinal_mulbunk_3/11b2p/step1/unimolowerpeaksforfew/redu_actionspace/11Bp_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_0press_30ts_Umo_lowpeaksfew_sigm_redu_actionspace_closetopeakinit_nsteps_6144_cost_0.1_num_actions_step1a/best_model.zip'
         log_dir_temp = f'trained_models/step2/11Bp_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_step2/best_model.zip'
 
 
     elif args.CL_step == 4:
-        # log_dir_temp = f'prefinal_mulbunk_3/11b2p/step1/unimolowerpeaksforfew/redu_actionspace/11Bp_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_0press_30ts__nsteps_6144_simplerew_+-1.0__neg0.1_0.1cost_step1b/best_model.zip'
-        #log_dir_temp = f'trained_models/step3/11Bp_2_el_25_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_step3/best_model.zip'
-        #log_dir_temp = f'prefinal_mulbunk_5.5/11b2p/step2/withnewpreciserew/11Bp_2_el_25_b_500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_step2_withnewpreciserew/best_model.zip'
         log_dir_temp = f'prefinal_mulbunk_5.5/11b2p/step2/withnewpreciserew/11Bp_2_el_25_b_1000000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_step2_withnewpreciserew/best_model.zip'
 
 
 
     elif args.CL_step == 5:
-        # log_dir_temp = f'prefinal_mulbunk_3/11b2p/step1/unimolowerpeaksforfew/redu_actionspace/11Bp_2_el_600_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_8_normalPandRW_60ts_nsteps_6144_simplerew_step2/best_model.zip'
-        #log_dir_temp = f'trained_models/step4/11Bp_2_el_600_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_8_step4/best_model.zip'
-        #log_dir_temp = f'prefinal_mulbunk_4/11b2p/step4/11Bp_2_el_600_b_1500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_step4_otopeakinit/best_model.zip'
-        #log_dir_temp = f'prefinal_mulbunk_5.5/11b2p/step4/withnewpreciserew/11Bp_2_el_600_b_100000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{10}_step4_withnewpreciserew/best_model.zip'
-        #log_dir_temp = f'prefinal_mulbunk_5.5/11b2p/step2/withnewpreciserew/11Bp_2_el_25_b_1000000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_step2_withnewpreciserew/best_model.zip'
         log_dir_temp = f'prefinal_mulbunk_5.5/11b2p/step4/withnewpreciserew/11Bp_2_el_600_b_500000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_10_step4_withnewpreciserew_from1milstep2/best_model.zip'
 
     
     elif args.CL_step == 6:
-        #log_dir_temp = f'trained_models/step1/unimolowerpeaksforfew/redu_actionspace/11Bp_2_el_600_b_500000_NAVf_512_512_NAPf_512_512__bs_64_kl_0.001_s_{seed}_normalPandRW_60ts_nsteps_6144_simplerew_clip0.05_kl0.001_seed8fromprev_step3/best_model.zip'
         log_dir_temp = f'prefinal_mulbunk_4/11b2p/baseline_origgaus/11Bp_2_el_600_b_5000000_NAVf_512_512_NAPf_512_512__bs_64_kl_None_s_{seed}_baseline_origgaus/best_model.zip'
         # the above is the best model from step 3 which i used in 15 inferences and also showed to prof.
 
-
-
-    # pretrained_model = PPO.load(log_dir_temp)
-    # #
-    # new_model =  PPO("MultiInputPolicy",
-    #             env,
-    #             seed=seed,
-    #             verbose=0,
-    #             ent_coef=args.ent_coef,
-    #             gamma=args.gamma,
-    #             # n_steps=args.n_steps,
-    #             # tensorboard_log="./ppo_sutco_tensorboard/"
-    #             tensorboard_log=tensorboard_log,
-    #             target_kl=args.target_kl,
-    #             policy_kwargs=config["policy_kwargs"]
-    #             )
-
-    # new_model.policy.load_state_dict(pretrained_model.policy.state_dict())
-
-    # model = new_model
 
     if args.CL_step in [1.5, 2, 3,5]: #if args.CL_step in [2, 3,5]:
         print("The value of args.CL_step is", args.CL_step)
@@ -432,12 +314,9 @@ def train(seed, args, shared_list):
         print("Callbacks used are:", callbacks)
         
         model.learn(total_timesteps=config["total_timesteps"],callback=auto_save_callback, progress_bar=True)
-        #model.learn(total_timesteps=config["total_timesteps"],callback=callbacks, progress_bar=True)
 
-        #model.learn(total_timesteps=config["total_timesteps"])
 
         
-    #model.learn(total_timesteps=config["total_timesteps"], callback=[auto_save_callback])
 
     print("Total training time: ", datetime.now() - start)
 
@@ -450,16 +329,6 @@ def train(seed, args, shared_list):
         print(f'saved the best model to wandb')
     print("loaded the model with best reward")
 
-    # evaluate the policy
-    # mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10, deterministic=True)
-    # print("Average episodic reward: {:} \u00B1 {:}".format(mean_reward, std_reward))
-
-    # if not args.track_wandb:
-    #     # plot training reward
-    #     results_plotter.plot_results([log_dir], args.total_timesteps, results_plotter.X_TIMESTEPS, "PPO Sutco")
-
-    # plot state variables logged during training
-    # plot_episode_new(log_dir+"/statevar/")
 
     # plot training volume and action distributions
     if args.verbose_logging:
@@ -511,8 +380,6 @@ def train(seed, args, shared_list):
 
         plot_episodic_obs(log_dir_statevar, n_bunkers=env.unwrapped.n_bunkers)
 
-        # run.finish()
-
     results_path = log_dir 
     if args.track_local:
         plot_local_inference(env=env,
@@ -542,80 +409,6 @@ def train(seed, args, shared_list):
                            upload_inf_wandb=args.track_wandb,
                            shared_list=shared_list,
                            args=args)
-        # # from env_aerorew_vectorized_moreinobsspace_fororgiinf import SutcoEnv as SutcoEnvInf
-        # # from env_aerorew_vectorized_moreinobsspace_5b1p_forinf import SutcoEnv as SutcoEnvInf
-        # #from env_aerorew_vectorized_moreinobsspace_5b2p_forinf import SutcoEnv as SutcoEnvInf
-        # from env_aerorew_vectorized_moreinobsspace_11b2p_normalpress_origrw import SutcoEnv as SutcoEnvInf
-        #
-        # env_real_inf = SutcoEnvInf(600,
-        #                            args.verbose_logging,
-        #                            args.bunkers,
-        #                            args.use_min_rew,
-        #                            args.number_of_presses)
-        #
-        # if verbose_logging:
-        #     env_real_inf = Monitor(env_real_inf, log_dir, info_keywords=("action", "volumes"))
-        # else:
-        #     env_real_inf = Monitor(env_real_inf, log_dir)
-        #
-        #     # do inference with the best trained agent and plot state variables
-        # volumes_real_inf, actions_real_inf, rewards_real_inf = inference(args=args,
-        #                                                                  log_dir=log_dir,
-        #                                                                  deterministic_policy=args.inf_deterministic,
-        #                                                                  max_episode_length=600,
-        #                                                                  env=env_real_inf)
-        #
-        # plot_local(env=env_real_inf,
-        #            volumes=volumes_real_inf,
-        #            actions=actions_real_inf,
-        #            rewards=rewards_real_inf,
-        #            seed=seed,
-        #            fig_name=run_name + "_realinf_",
-        #            save_fig=args.save_inf_fig,
-        #            color="blue",
-        #            bunker_names=bunker_names,
-        #            fig_dir=log_dir,
-        #            upload_inf_wandb=args.track_wandb
-        #            )
-        #
-        # plot_local_voldiff(env=env_real_inf,
-        #                    volumes=volumes_real_inf,
-        #                    actions=actions_real_inf,
-        #                    rewards=rewards_real_inf,
-        #                    seed=seed,
-        #                    fig_name=run_name + "_realinf_",
-        #                    save_fig=args.save_inf_fig,
-        #                    color="blue",
-        #                    bunker_names=bunker_names,
-        #                    fig_dir=log_dir,
-        #                    upload_inf_wandb=args.track_wandb
-        #                    )
-        #
-        # plot_local(env=env_real_inf,
-        #            volumes=volumes_real_inf,
-        #            actions=actions_real_inf,
-        #            rewards=rewards_real_inf,
-        #            seed=seed,
-        #            fig_name=run_name + "_realinfscaledvol_",
-        #            save_fig=args.save_inf_fig,
-        #            color="blue",
-        #            bunker_names=bunker_names,
-        #            fig_dir=log_dir,
-        #            upload_inf_wandb=args.track_wandb
-        #            )
-        #
-        # plot_local_voldiff(env=env_real_inf,
-        #                    volumes=volumes_real_inf,
-        #                    actions=actions_real_inf,
-        #                    rewards=rewards_real_inf,
-        #                    seed=seed,
-        #                    fig_name=run_name + "_realinfscaledvol_",
-        #                    save_fig=args.save_inf_fig,
-        #                    color="blue",
-        #                    bunker_names=bunker_names,
-        #                    fig_dir=log_dir,
-        #                    upload_inf_wandb=args.track_wandb
-        #                    )
 
     run.finish()
 
