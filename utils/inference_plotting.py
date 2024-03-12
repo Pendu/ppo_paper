@@ -340,7 +340,7 @@ def plot_local_inference(env=None, volumes=None, actions=None, rewards=None, see
 
     if save_fig:
         # Save plot
-        plt.savefig(results_path+fig_name + '.jpg', dpi=fig.dpi)
+        plt.savefig(results_path+fig_name + '.jpg', dpi=fig.dpi) 
         # plt.savefig('{}/graph.png'.format(fig_dir))
 
     if upload_inf_wandb:

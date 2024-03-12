@@ -1,10 +1,6 @@
 import gymnasium as gym
 from gymnasium import error, spaces, utils
 
-# import gym
-# from gym import error, spaces, utils
-# import sys
-# sys.modules["gym"] = gym
 
 import numpy as np
 import pandas as pd
@@ -258,7 +254,7 @@ class SutcoEnv(gym.Env):
                     self.state["Bunkers being emptied"][action - 1] = 1
                     self.times["Time presses will be free"][0] = t_pressing_ends
                     self.state["Time presses will be free normalized"][0] = t_pressing_ends / self.timestep
-                    self.times["Time emptying ends"][action - 1] = t_pressing_ends  # TODO: Use emptying models
+                    self.times["Time emptying ends"][action - 1] = t_pressing_ends  
                 else:  # Emptying is not possible
                     press_is_free = False
                     self.state = self.state
@@ -594,33 +590,6 @@ class SutcoEnv(gym.Env):
             truncated,
             info,
         )
-
-
-        #return self.state, reward, done, info
-
-    # def reset(self, seed=None, options=None):
-    #     # Assume super().reset(seed=seed, options=options) properly initializes any base class components
-    #     #super().reset(seed=seed, options=options)
-        
-    #     # Initialize the state of the environment
-    #     self.state = {
-    #         "Volumes": np.random.uniform(low=self.min_vol, high=self.max_vol, size=(self.n_bunkers,)).astype(np.float32),
-    #         "Bunkers being emptied": np.random.randint(low=0, high=2, size=(self.n_bunkers,)).astype(np.float32),
-    #         "reward": np.random.uniform(low=-10, high=1000, size=(self.n_bunkers,)).astype(np.float32),
-    #         "Time presses will be free normalized": np.random.uniform(low=0, high=100, size=(2,)).astype(np.float32),
-    #         "peak vol": np.random.uniform(low=0, high=40, size=(self.n_bunkers,)).astype(np.float32),
-    #     }
-        
-    #     # Reset time-related states
-    #     self.times["Time presses will be free"] = np.zeros(2)
-    #     self.times["Time conveyor belts will be free"] = np.zeros(2)
-    #     self.times["Time emptying ends"] = np.zeros(self.n_bunkers)
-        
-    #     # Reset other internal states as necessary (e.g., episode length)
-    #     self.episode_length = 0
-        
-    #     # Return the initial observation directly
-    #     return self.state, {}
     
     def reset(self, seed=None, options=None):
         super().reset(seed=seed, options=options)
@@ -695,22 +664,6 @@ class SutcoEnv(gym.Env):
         # Implement Visualization
         pass
 
-    # def set_state(self, volumes,
-    #               times_presses_free=np.array(2 * [0.]),
-    #               time_conveyor_belts_free=np.array(2 * [0.]),
-    #               bunkers_being_emptied=None,
-    #               time_emptying_ends=None):
-    #     self.state["Volumes"] = volumes
-    #     self.times["Time presses will be free"] = times_presses_free
-    #     self.times["Time conveyor belts will be free"] = time_conveyor_belts_free
-    #     if bunkers_being_emptied:
-    #         self.state["Bunkers being emptied"] = bunkers_being_emptied
-    #     else:
-    #         self.state["Bunkers being emptied"] = np.zeros(self.n_bunkers)
-    #     if time_emptying_ends:
-    #         self.times["Time emptying ends"] = time_emptying_ends
-    #     else:
-    #         self.times["Time emptying ends"] = np.array(self.n_bunkers * [0.])
 
     def action_masks(self):
         """
