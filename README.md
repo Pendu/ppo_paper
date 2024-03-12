@@ -15,7 +15,7 @@
 ### Pre-requisites
 * Python >=3.8.0,<3.10
 * Conda
-### Install conda
+### Conda
 * Download the installer: [Installer link](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)
 ```{bash}
 bash <conda-installer-name>-latest-Linux-x86_64.sh
@@ -38,7 +38,11 @@ conda activate myenv
 pip install -r requirements.txt
 ```
 
-## Reproduce results from the paper
+##  📊 Reproduce results from the paper
 ```
 python reproduce_results_paper.py
 ```
+
+## 🎭 Support and Contributions
+
+Feel free to ask questions. Posting in [Github Issues]( https://github.com/Pendu/ContainerGym_Prefinal/issues) and PRs are also welcome.
