@@ -6,7 +6,7 @@
 ![dependencies status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen)
 
 ## 🖊 Info
-### Example render of the ContainerGym environment during evaluation
+### Example render of the environment during evaluation
 <p align="center">
 <img src= "https://github.com/Pendu/ContainerGym_Prefinal/blob/2c3589ef8c90c77832ccc0808fc7aafa6eec1713/example.gif" width="80%" height="80%"/>
 </p>
@@ -16,8 +16,9 @@
 * Python >=3.8.0,<3.10
 * Conda
 ### Install conda
+* Download the installer: [Installer link](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)
 ```{bash}
-bash Anaconda-latest-Linux-x86_64.sh
+bash <conda-installer-name>-latest-Linux-x86_64.sh
 ```
 
 ## 🤖 Installation
