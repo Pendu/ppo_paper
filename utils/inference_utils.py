@@ -1,72 +1,52 @@
-import os
 import argparse
+import glob
+import os
+import shutil
+import warnings
 from datetime import datetime
 from distutils.util import strtobool
-from typing import Callable, Dict, List, Optional, Tuple, Type, Union
-from multiprocessing import Process, Manager
-import warnings
-warnings.filterwarnings('ignore')
-from statsmodels.distributions.empirical_distribution import ECDF
-import matplotlib.pyplot as plt
-from tqdm.auto import tqdm
-import pandas as pd
-import numpy as np
-import glob
-import shutil
-from sb3_contrib import TRPO, MaskablePPO
-from stable_baselines3 import DQN
-from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
-from stable_baselines3 import PPO
-from sb3_contrib.common.maskable.utils import get_action_masks
-from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3.common import results_plotter
-from multiprocessing import Process
-from stable_baselines3.common.vec_env import VecMonitor
-from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.policies import ActorCriticPolicy
-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
-from stable_baselines3.common.vec_env import SubprocVecEnv
-from utils.callbacks import *
-from utils.episode_plotting import plot_volume_and_action_distributions, plot_episode_new
-import torch
-from torch import nn
-from torch.multiprocessing import Process
-import torch as th
-import wandb
-from wandb.integration.sb3 import WandbCallback
-os.environ['CUDA_VISIBLE_DEVICES'] = ''
-torch.set_num_threads(1)
-from typing import Callable, Dict, List, Optional, Tuple, Type, Union
-import torch as th
-from torch import nn
-from stable_baselines3 import PPO
-from stable_baselines3.common.policies import ActorCriticPolicy
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from functools import partial
 from math import inf
-import pandas as pd
-from scipy.signal import find_peaks, peak_prominences
-from math import inf
+from multiprocessing import Manager, Process
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+
+import matplotlib.pyplot as plt
 import numpy as np
-from utils.inference_plotting import *
+import pandas as pd
+import torch
+import torch.nn as nn
+import wandb
 from models.optimal_analytic_agent import *
+from sb3_contrib import MaskablePPO, TRPO
+from sb3_contrib.common.maskable.utils import get_action_masks
+from scipy.signal import find_peaks, peak_prominences
+from stable_baselines3 import DQN, PPO
+from stable_baselines3.common import results_plotter
+from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
+from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.policies import ActorCriticPolicy
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecMonitor, VecNormalize
+from stable_baselines3.common.env_util import make_vec_env
+from statsmodels.distributions.empirical_distribution import ECDF
+from tqdm.auto import tqdm
+from utils.callbacks import *
+from utils.episode_plotting import plot_episode_new, plot_volume_and_action_distributions
+from utils.inference_plotting import *
+from wandb.integration.sb3 import WandbCallback
+import torch as th
+
+warnings.filterwarnings('ignore')
+os.environ['CUDA_VISIBLE_DEVICES'] = ''
+torch.set_num_threads(1)
 
 # Import the environment
 from env import SutcoEnv
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = ''
-torch.set_num_threads(1)
-
-
-
-
-
 def inference(args=None, log_dir=None, max_episode_length=None,
               deterministic_policy=True, env=None, seed = None, plot_local = None, fig_name= None, results_path = None):
-    """
-    Run inference using a trained agent.
+    """Run inference using a trained agent.
 
     Args:
         args (object): Optional arguments.
@@ -194,28 +174,28 @@ def inference(args=None, log_dir=None, max_episode_length=None,
 
     return volumes, actions, rewards, t_p1, t_p2
 
+
 def inference_optimal_analytic(args = None,log_dir=None, max_episode_length=None,
               deterministic_policy=True, env_input = None, model_input = None, plot_local = None, fig_name = None, seed = None, save_inf_fig = None, results_path = None):  # TODO: remove log_dir param
     
+    """Run inference using the optimal analytic agent.
+    
+    Args:
+        args (object): Optional arguments.
+        log_dir (str): Directory where the trained agent is saved.
+        max_episode_length (int): Maximum length of an episode.
+        deterministic_policy (bool): Whether to sample from a deterministic policy or not.
+        env_input (object): Environment object.
+        model_input (object): Model object.
+        plot_local (bool): Whether to plot local inference results or not.
+        fig_name (str): Name used for the plots.
+        seed (int): Random seed.
+        save_inf_fig (bool): Whether to save the inference plots.
+        results_path (str): Path to save the results.
+    
+    Returns:
+        tuple: A tuple containing volumes, actions, rewards, t_p1, and t_p2.
     """
-    Run inference on a trained agent (best model)
-    
-    :param args: Argparse parameters from console
-    :param log_dir: From where to load trained agent
-    :param max_episode_length: Maximum episode length for inference 
-    :param fig_name: Name used for the plots
-    :param deterministic_policy: Whether to sample from deterministic policy or stochastic
-    :param env_input: The environment object used for inference
-    :param model_input: The trained model used for inference
-    :param plot_local: Whether to plot the results locally
-    :param seed: Seed value for reproducibility
-    :param save_inf_fig: Whether to save the inference plots
-    :param results_path: Path to save the inference results
-    
-    :return: The volumes, actions, rewards, t_p1, and t_p2 from the inference
-    
-    """
-    
     # Toggle verbose logging to save parameters for each episode 
     verbose_logging = False
     
@@ -305,6 +285,22 @@ def inference_optimal_analytic(args = None,log_dir=None, max_episode_length=None
     return volumes, actions, rewards, t_p1, t_p2
 
 def average_inference(seed, args, shared_list, plot_local = None, rollouts = None, fig_name = None, n_rollouts = None, results_path = None):
+    
+    """ Perform 15 rollouts using the trained agent and calculate the average reward, episode length, overflow, etc.
+    
+    Args:
+        seed (int): Random seed.
+        args (object): Optional arguments.
+        shared_list (list): A list to store the results of the rollouts.
+        plot_local (bool): Whether to plot local inference results or not.
+        rollouts (bool): Whether to perform rollouts or not.
+        fig_name (str): Name used for the plots.
+        n_rollouts (int): Number of rollouts to perform.
+        results_path (str): Path to save the results.
+    
+    Returns:
+        tuple: A tuple containing the results of the rollouts and a dataframe containing the results of all rollouts.
+    """
 
     bunker_names = bunker_ids(args.bunkers)
     # name of the run
@@ -481,6 +477,21 @@ def average_inference(seed, args, shared_list, plot_local = None, rollouts = Non
     return dict_new,  pd.DataFrame(list(shared_list))
 
 def average_inference_optimal_analytic(seed, args, shared_list, plot_local = None, rollouts = None, fig_name = None, n_rollouts = None, results_path = None):
+    """ Perform 15 rollouts using the optimal analytic agent and calculate the average reward, episode length, overflow, etc.
+    
+    Args:
+        seed (int): Random seed.
+        args (object): Optional arguments.
+        shared_list (list): A list to store the results of the rollouts.
+        plot_local (bool): Whether to plot local inference results or not.
+        rollouts (bool): Whether to perform rollouts or not.
+        fig_name (str): Name used for the plots.
+        n_rollouts (int): Number of rollouts to perform.
+        results_path (str): Path to save the results.
+    
+    Returns:
+        tuple: A tuple containing the results of the rollouts and a dataframe containing the results of all rollouts.
+    """
 
     bunker_names = bunker_ids(args.bunkers)
     # name of the run

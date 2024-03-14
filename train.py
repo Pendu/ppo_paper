@@ -11,7 +11,6 @@ import pandas as pd
 import numpy as np
 import glob
 import shutil
-import os
 from sb3_contrib import TRPO, MaskablePPO
 from stable_baselines3 import DQN
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
@@ -19,8 +18,6 @@ from stable_baselines3 import PPO
 from sb3_contrib.common.maskable.utils import get_action_masks
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3.common import results_plotter
-from multiprocessing import Process
 from stable_baselines3.common.vec_env import VecMonitor
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.policies import ActorCriticPolicy
@@ -33,39 +30,25 @@ from utils.callbacks import *
 
 from env import SutcoEnv
 
-from utils.episode_plotting import plot_volume_and_action_distributions, plot_episode_new
 
 import torch
 from torch import nn
-from torch.multiprocessing import Process
 import torch as th
 
 import wandb
 from wandb.integration.sb3 import WandbCallback
 
 from math import inf
-import pandas as pd
 from scipy.signal import find_peaks, peak_prominences
-from math import inf
-import numpy as np
 
-from typing import Callable, Dict, List, Optional, Tuple, Type, Union
 
-import torch as th
-from torch import nn
-
-from stable_baselines3 import PPO
-from stable_baselines3.common.policies import ActorCriticPolicy
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from functools import partial
 
 import warnings
-from typing import Any, Dict, Optional, Type, Union
 
-import numpy as np
-import torch as th
+
 from torch.nn import functional as F
-import torch
 
 from stable_baselines3.common.on_policy_algorithm import OnPolicyAlgorithm
 from stable_baselines3.common.policies import ActorCriticCnnPolicy, ActorCriticPolicy, BasePolicy, \
@@ -73,16 +56,6 @@ from stable_baselines3.common.policies import ActorCriticCnnPolicy, ActorCriticP
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
 from stable_baselines3.common.utils import explained_variance, get_schedule_fn
 
-
-from typing import Callable, Dict, List, Optional, Tuple, Type, Union
-
-import torch as th
-from torch import nn
-
-from stable_baselines3 import PPO
-from stable_baselines3.common.policies import ActorCriticPolicy
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
-from functools import partial
 
 
 from utils.train_utils import parse_args, inference

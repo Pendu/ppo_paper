@@ -2,6 +2,15 @@ import os
 import shutil
 
 def delete_files_and_folders(directory):
+    """
+    Delete all files and folders within a specified directory except for a file named 'best_model.zip'.
+
+    Parameters
+    ----------
+    directory : str
+        The path to the directory from which files and folders are to be deleted.
+
+    """
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file != "best_model.zip":

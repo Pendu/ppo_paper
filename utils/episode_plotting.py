@@ -79,26 +79,25 @@ def get_max_episodes(monitor_dir='logs/monitor.csv'):
     return len(df)-1
 
 def plot_volume_and_action_distributions(fig_name = "",monitor_dir='logs/monitor.csv', save_fig = False, plot_wandb = None ,  run = None ):
-    """
-    Plots the distribution (histogram) of all volumes/actions observed/performed during training.
-
-    :param fig_name: string
-        name of the figure to be saved (optional)
-
-    :param monitor_dir: string
-        path to monitor.csv
-
-    :param save_fig: bool
-        flag to save the figure (optional)
-
-    :param plot_wandb: bool
-        flag to plot the figure on Weights & Biases (optional)
-
-    :param run: string
-        Weights & Biases run ID (optional)
-
-    :return: matplotlib.pyplot object
-        the generated plot
+    """Plots the distribution (histogram) of all volumes/actions observed/performed during training.
+    
+    Parameters
+    ----------
+    fig_name : str, optional
+        Name of the figure to be saved (default is "").
+    monitor_dir : str, optional
+        Path to the monitor.csv file (default is 'logs/monitor.csv').
+    save_fig : bool, optional
+        Flag to save the figure (default is False).
+    plot_wandb : bool, optional
+        Flag to plot the figure on Weights & Biases (default is None).
+    run : str, optional
+        Weights & Biases run ID (default is None).
+    
+    Returns
+    -------
+    plt : matplotlib.pyplot object
+        The generated plot.
     """
     df = pd.read_csv(monitor_dir, header=1)
 

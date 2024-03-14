@@ -12,6 +12,15 @@ from sb3_contrib.common.maskable.utils import get_action_masks
 
 
 def parse_args():
+    """
+    Parse the arguments from the command line
+    
+    Returns
+    -------
+    args : Namespace
+        The arguments passed to the training script, containing hyperparameters and environment settings.
+    """
+    
     parser = argparse.ArgumentParser()
 
     # Experiment specific arguments
@@ -99,11 +108,35 @@ def parse_args():
 def inference(args=None, log_dir=None, max_episode_length=None,
               deterministic_policy=True, env=None, shared_list = None, seed = None): 
     """
-    :param log_dir: Where to load trained agent
-    :param fig_name: Name used for the plots
-    :param save_fig: Whether to save the plotted figure or not
-    :param deterministic_policy: Whether to sample from deterministic policy or not
-    :return:
+    Perform inference with the trained model on the environment.
+
+    Parameters
+    ----------
+    args : Namespace
+        The arguments passed to the training script, containing hyperparameters and environment settings.
+    log_dir : str
+        The directory where logs and the trained model are stored.
+    max_episode_length : int
+        The maximum length of an episode.
+    deterministic_policy : bool
+        Whether to use a deterministic policy during inference.
+    env : gym.Env
+        The environment to perform inference on.
+    shared_list : multiprocessing.Manager().list
+        A shared list for multiprocessing, used to store results from parallel environments.
+    seed : int
+        The random seed for environment and model reproducibility.
+
+    Returns
+    -------
+    volumes : list
+        A list of volumes observed during the episode.
+    actions : list
+        A list of actions taken during the episode.
+    rewards : list
+        A list of rewards received during the episode.
+    t_p1 : list
+        A placeholder list, reserved for future use.
     """
     env = SutcoEnv(max_episode_length,
                    args.verbose_logging,

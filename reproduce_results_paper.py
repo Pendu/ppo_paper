@@ -1,6 +1,4 @@
-#from utils.inference_utils import average_inference, average_inference_optimal_analytic
 from utils.inference_utils import average_inference, average_inference_optimal_analytic
-
 from utils.inference_plotting import *
 import json
 from argparse import Namespace
@@ -315,5 +313,6 @@ plt.tight_layout()  # Adjust layout to make room for the rotated x-axis labels
 plot_path = results_path+'avg_total_safety_violations.png'
 plt.savefig(plot_path)
 print(f"Percentage Safety Violations for 15 agents saved as {plot_path}")
+
 
 

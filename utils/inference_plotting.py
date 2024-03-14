@@ -7,9 +7,10 @@ from statsmodels.distributions.empirical_distribution import ECDF
 from utils.metrics import *
 from utils.container_utils import *
 
+# Read the parameters from the config file 
 params = pd.read_csv('configs/RW_param_all_bunkers_orig.csv').set_index('bunker_id')
 
-# for a single agent type
+# Plot ECDF for a single agent type
 def plot_ecdf_volume(emptying_volumes=None, agent_type=None):
     """
     Plot the empirical cumulative distribution function (ECDF) of emptying volumes.
@@ -89,7 +90,7 @@ def plot_ecdf_volume(emptying_volumes=None, agent_type=None):
         os.makedirs(save_dir, exist_ok=True)
         plt.savefig(save_dir + "ecdf" + "_" + k + ".%s" % format, dpi="figure", format="png")
 
-# for multiple agent types
+# Plot ECDF for multiple agent types
 def plot_ecdf_volume_allagents(emptying_volumes=None, results_path=None, labels=None):
     """
     Plots the ECDF (Empirical Cumulative Distribution Function) for emptying volumes of different agents.

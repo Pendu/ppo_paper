@@ -55,9 +55,13 @@ def get_peaks(volumes, actions, bunker):
     return filtered_indices
 
 def bunker_ids(bunker_indices):
-    """
-    :param args.bunkers: the indicies of the bunkers used in the environment
-    :return: list of actual bunker names
+    """Return the names of the bunkers used in the environment.
+
+    Args:
+        bunker_indices (list): The indices of the bunkers used in the environment.
+
+    Returns:
+        list: The names of the bunkers used in the environment.
     """
 
     bunker_ids_all = [
