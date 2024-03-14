@@ -16,10 +16,7 @@
 * Python >=3.8.0,<3.10
 * Conda
 ### Conda
-* Download the installer: [Installer link](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)
-```{bash}
-bash <conda-installer-name>-latest-Linux-x86_64.sh
-```
+* Follow instructions : [Installer link](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)
 
 ## 🤖 Installation
 
