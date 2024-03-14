@@ -43,6 +43,12 @@ pip install -r requirements.txt
 python reproduce_results_paper.py
 ```
 
+## Sample training for phase-1 (#TODO)
+```
+python train.py --train True --total-timesteps=30000 --bunkers 1 2 3 5 6 7 8 9 12 13 14 --seed 1 --track-wandb=False --max-episode-length 25 --log-dir ./results_training/setp1/ --gamma
+ 0.99 --wandb-project-name prefinal_mulbunk_5 --envlogger=False --envlogger-freq 2000 --track-local=True --number-of-presses=2 --use-min-rew True --batch-size 64 --filename-suffix baseline_origgaus_run5 --NA-Vf 512 512 --NA-Pf 512 512 --n-steps 6144 --CL-step 1
+```
+
 ## 🎭 Support and Contributions
 
 Feel free to ask questions. Posting in [Github Issues]( https://github.com/Pendu/ContainerGym_Prefinal/issues) and PRs are also welcome.
