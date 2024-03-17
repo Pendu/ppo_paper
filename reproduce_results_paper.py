@@ -170,6 +170,8 @@ combined_df_bestseeds = pd.concat([ppo_baseline_best, ppo_best, ppo_optimal_anal
 
 # Simplify the DataFrame by combining average and std dev columns, and removing unnecessary columns
 combined_df_bestseeds['Average Inference Reward (±Std Dev)'] = round(combined_df_bestseeds['average_inference_reward'],2).astype(str) + " (±" + round(combined_df_bestseeds['standard_dev_in_inference_reward'],2).astype(str) + ")"
+combined_df_bestseeds['Emptying actions'] = combined_df_bestseeds['emptying actions'].astype(str)
+combined_df_bestseeds['Reward per Empyting Action'] = round(combined_df_bestseeds['reward per emptying action'],2).astype(str)
 combined_df_bestseeds['Average Inference Overflow (±Std Dev)'] = round(combined_df_bestseeds['average_inference_overflow'],2).astype(str) + " (±" + round(combined_df_bestseeds['standard_dev_in_inference_overflow'],2).astype(str) + ")"
 
 
