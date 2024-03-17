@@ -43,6 +43,46 @@ torch.set_num_threads(1)
 # Import the environment
 from env import SutcoEnv
 
+def filter_repetition_actions(actions, window_size):
+    """
+    Filters out repeated actions (which are greater than zero) within a specified window size, 
+    setting all but the latest occurrence to zero.
+
+    Parameters:
+    - actions (List[int]): The list of actions.
+    - window_size (int): The size of the window to check for repetition.
+
+    Returns:
+    - List[int]: The modified list of actions with repetitions filtered.
+    """
+    for i in range(len(actions)):
+        if i + window_size <= len(actions):
+            window = actions[i:i+window_size]
+            # Filter to consider only actions greater than zero
+            unique_actions = set(action for action in window if action > 0)
+            if len(window) - window.count(0) != len(unique_actions):  # Check if there's any repetition among non-zero actions
+                # Find the last occurrence of each action in the window
+                last_occurrences = {action: (i + window_size - 1 - window[::-1].index(action)) for action in unique_actions}
+                # Replace all actions with 0 except the latest occurrence of each action
+                for j in range(i, i + window_size):
+                    if j != last_occurrences.get(actions[j], -1):
+                        actions[j] = 0
+    return actions
+
+def filter_repetition_rewards(rewards, actions):
+    """
+    Filters out rewards corresponding to actions that are zero, setting those rewards to zero.
+
+    Parameters:
+    - rewards (List[float]): The list of rewards.
+    - actions (List[int]): The list of actions.
+
+    Returns:
+    - List[float]: The modified list of rewards with rewards corresponding to zero actions filtered.
+    """
+    filtered_rewards = [reward if action != 0 else 0 for reward, action in zip(rewards, actions)]
+    return filtered_rewards
+
 
 def inference(args=None, log_dir=None, max_episode_length=None,
               deterministic_policy=True, env=None, seed = None, plot_local = None, fig_name= None, results_path = None):
@@ -590,6 +630,11 @@ def average_inference_optimal_analytic(seed, args, shared_list, plot_local = Non
                                       seed=seed,
                                       save_inf_fig=True,
                                       results_path = results_path)
+        
+        # filter repetition in actions if the same action is repeated more than once in a window of 15 time steps 
+        actions = filter_repetition_actions(actions, 15)
+        
+        rewards = filter_repetition_rewards(rewards, actions)
         
         overflow, total_volume_processed_all_bunkers,emptying_volumes = calculate_overflow(env=env,
                            volumes=volumes,
