@@ -8,7 +8,7 @@
 ## 🖊 Info
 ### Example render of the environment during evaluation
 <p align="center">
-<img src= "https://github.com/Pendu/ContainerGym_Prefinal/blob/2c3589ef8c90c77832ccc0808fc7aafa6eec1713/example.gif" width="80%" height="80%"/>
+<img src= "https://gitlab.com/anonymousppocl1/ppo_paper/-/blob/main/example.gif?ref_type=heads" width="80%" height="80%"/>
 </p>
 
 ## 📚 Setup
