@@ -20,6 +20,12 @@
 
 ## 🤖 Installation
 
+
+```{bash}
+git clone git@gitlab.com:anonymousppocl1/ppo_paper.git
+cd ppo_paper
+```
+
 Create a conda virtual environment and run the following commands
 
 ```{bash}
