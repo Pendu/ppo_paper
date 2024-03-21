@@ -268,6 +268,7 @@ def plot_local_inference(env=None, volumes=None, actions=None, rewards=None, see
 
     ax1.grid()
     ax2.grid()
+    #ax3.grid()
     ax3.grid()
     ax4.grid()
     ax5.grid()
@@ -329,7 +330,7 @@ def plot_local_inference(env=None, volumes=None, actions=None, rewards=None, see
                     clip_on=False
                     )
 
-    ax3.annotate("Cumul. reward: {:.2f}".format(sum(rewards)), xy=(0.81, 1.02), xycoords='axes fraction', fontsize=12)
+    #ax3.annotate("Cumul. reward: {:.2f}".format(sum(rewards)), xy=(0.81, 1.02), xycoords='axes fraction', fontsize=12)
 
     ax4.plot(t_p1, linewidth=3, label="press-1")
     ax5.plot(t_p2, linewidth=3, label="press-2")
@@ -347,6 +348,151 @@ def plot_local_inference(env=None, volumes=None, actions=None, rewards=None, see
     if upload_inf_wandb:
         # log image into wandb
         wandb.log({"xyz": wandb.Image(fig)})
+        
+        
+        
+        
+def plot_vol_deviation(env=None, volumes=None, actions=None, rewards=None, seed=None, fig_name=None, save_fig=None,
+                       color=None,
+                       bunker_names=None, fig_dir=None, upload_inf_wandb=False, shared_list = None, args = None, results_path = None):
+    peak_rew_vols = {#"C1-10": [19.84],
+        "C1-20": [26.75],
+        "C1-30": [26.52],  # 10
+        "C1-40": [8.34],
+    # "C1-50": [31.53],
+        "C1-60": [14.34],  # 15
+        "C1-70": [25.93],  # 20
+        "C1-80": [24.75],  # 32
+        "C2-10": [27.39],
+        "C2-20": [32],
+        "C2-40": [25.77],
+    # "C2-50": [32.23], 
+        "C2-60": [12.6],
+        "C2-70": [17],
+        "C2-80": [28.75],
+        "C2-90": [28.79]}
+
+    default_color = "#1f77b4"  # Default Matplotlib blue color
+    color_code = {
+        "C1-20": "#0000FF",  # blue
+        "C1-30": "#FFA500",  # orange
+        "C1-40": "#008000",  # green
+        "C1-60": "#FF00FF",  # fuchsia
+        "C1-70": "#800080",  # purple
+        "C1-80": "#FF4500",  # orangered
+        "C2-10": "#FFFF00",  # yellow
+        "C2-20": "#A52A2A",  # brown
+        "C2-60": "#D2691E",  # chocolate
+        "C2-70": "#20B2AA",  # lightseagreen
+        "C2-80": "#87CEEB"  # skyblue
+    }  
+
+    env_unwrapped = env.unwrapped
+    fig = plt.figure(figsize=(15, 12))  # change the size of figure!
+    fig.tight_layout()
+
+    percentage_list = []
+    total_overflow_underflow = 0
+    total_volume_processed_all_bunkers = 0
+
+    for i in range(env_unwrapped.n_bunkers):
+    #for i in range(1):
+
+        #plt.subplot(env_unwrapped.n_bunkers + 1, 1, i + 1)
+
+        x = np.array(volumes)[:, i]
+        actions_1 = actions[:]
+        volume_y_old = []
+        volume_x = []
+        volume_y = []
+        overflow = 0
+        underflow = 0
+        total_vol_processed = 0
+
+        # Find peaks in x with height greater than 5
+        df = pd.DataFrame(x)
+        peaks = get_peaks(np.array(volumes)[:, i], actions_1, i)
+
+        for j in range(len(x)):
+            if j in peaks and j != len(x) - 1:  # and actions_1[j]!=0
+                # if x[j - 1] > 3 and x[j] == 0: #to avoid small peaks due to variance
+                volume_x.append(j)
+                diff = x[j-1] - peak_rew_vols[env_unwrapped.bunker_ids[i][0]][-1]
+                total_vol_processed += x[j-1]
+                if diff < 0:
+                    underflow += diff
+                else:
+                    overflow += diff
+                volume_y.append(diff)
+                
+        suffix = ""
+
+        #fig.suptitle("Ideal volume minus actual volume for bunkers" + suffix)
+
+        #plt.plot(volume_x, volume_y, linewidth=3, label=env_unwrapped.bunker_ids[i][0],
+        #         color=color_code[env_unwrapped.bunker_ids[i][0]], marker='o'
+        #         )
+
+        # Annotate cumulative underflow and overflow for each subplot
+        # plt.annotate(f'cum_underflow_ideal: {underflow}', xy=(0.2, 0.9), xycoords='axes fraction')
+        # plt.annotate(f'cum_overflow_ideal: {overflow}', xy=(0.2, 0.75), xycoords='axes fraction')
+        #plt.annotate(f'cum_overandunderflow_ideal: {(overflow - underflow):.2f}', xy=(0.05, 0.85),
+        #             xycoords='axes fraction')
+        #plt.annotate(f'total_vol_processed: {total_vol_processed:.2f}', xy=(0.05, 0.65), xycoords='axes fraction')
+
+        if total_vol_processed:
+
+            percentage = ((overflow - underflow) / total_vol_processed) * 100
+            percentage_list.append(percentage)
+        else:
+            percentage = 0
+            percentage_list.append(0)
+
+        total_overflow_underflow += (overflow - underflow)
+        total_volume_processed_all_bunkers += total_vol_processed
+
+        #plt.annotate(f'% overandunderflow_ideal: {percentage:.2f}', xy=(0.05, 0.45), xycoords='axes fraction')
+
+        #plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.2, hspace=0.4)
+
+        #plt.grid()
+        #plt.legend()
+        
+        
+    bunker_ids = [b[0] for b in env_unwrapped.bunker_ids]
+
+    if total_volume_processed_all_bunkers:
+        # Calculate overall percentage
+        overall_percentage = (total_overflow_underflow / total_volume_processed_all_bunkers) * 100
+    else:
+        overall_percentage = 0
+
+    plt.bar(bunker_ids, percentage_list)
+    plt.xlabel('Bunker IDs')
+    plt.ylabel('Percentage of Over-and-Underflow')
+    plt.title('Percentage of Over-and-Underflow by Bunker (wrt ideal vol)')
+    plt.annotate(f'episodic cum_overandunderflow_ideal: {overflow - total_overflow_underflow:.2f}', xy=(0.05, 0.85),
+                 xycoords='axes fraction')
+    plt.annotate(f'episodic total_vol_processed: {total_volume_processed_all_bunkers:.2f}', xy=(0.05, 0.65),
+                 xycoords='axes fraction')
+    plt.annotate(f'episodic % Over-and-Underflow : {overall_percentage:.2f}%', xy=(0.05, 0.45),
+                 xycoords='axes fraction')
+    
+
+    if save_fig:
+        # Save plot
+        #plt.savefig(results_path + fig_name + '_voldiff_.jpg', dpi=fig.dpi)
+        # plt.savefig(fig_dir+fig_name + 'infwithoutmask_voldiff.jpg', dpi=fig.dpi)
+        # plt.savefig('{}/graph.png'.format(fig_dir))
+        pass 
+
+    if upload_inf_wandb:
+        # log image into wandb
+        wandb.log({"xyz": wandb.Image(fig)})
+
+    #plt.show()
+    
+    return percentage_list
 
 
 

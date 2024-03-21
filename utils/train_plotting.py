@@ -149,7 +149,7 @@ def plot_local_during_training(seed, args, shared_list):
 
     env_inf = env
 
-    volumes, actions, rewards, t_p1, t_p2 = inference(args=args,
+    volumes, actions, rewards, t_p1, t_p2, vol_dev_list = inference(args=args,
                                                       log_dir=log_dir,
                                                       deterministic_policy=args.inf_deterministic,
                                                       max_episode_length=600,

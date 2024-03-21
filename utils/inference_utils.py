@@ -210,9 +210,27 @@ def inference(args=None, log_dir=None, max_episode_length=None,
                 t_p1=t_p1,
                 t_p2=t_p2,
                 results_path = results_path)
+        
+        vol_dev = plot_vol_deviation(env=env,
+                           volumes=volumes,
+                           actions=actions,
+                           rewards=rewards,
+                           seed=seed,
+                           fig_name=fig_name,
+                           save_fig=args.save_inf_fig,
+                           color="blue",
+                           bunker_names=None,
+                           fig_dir=log_dir,
+                           upload_inf_wandb=args.track_wandb,
+                           shared_list=None,
+                           args=args,
+                           results_path= results_path)
+    else:
+        vol_dev = None
+    
 
 
-    return volumes, actions, rewards, t_p1, t_p2
+    return volumes, actions, rewards, t_p1, t_p2, vol_dev
 
 
 def inference_optimal_analytic(args = None,log_dir=None, max_episode_length=None,
@@ -320,9 +338,27 @@ def inference_optimal_analytic(args = None,log_dir=None, max_episode_length=None
                 t_p1=t_p1,
                 t_p2=t_p2,
                 results_path = results_path)
+        
+        vol_dev = plot_vol_deviation(env=env,
+                    volumes=volumes,
+                    actions=actions,
+                    rewards=rewards,
+                    seed=seed,
+                    fig_name=fig_name,
+                    save_fig= True,
+                    color="blue",
+                    bunker_names=None,
+                    fig_dir=log_dir,
+                    upload_inf_wandb=False,
+                    shared_list=None,
+                    args=None,
+                    results_path= results_path)
+    else:
+        vol_dev = None
+        
                 
 
-    return volumes, actions, rewards, t_p1, t_p2
+    return volumes, actions, rewards, t_p1, t_p2, vol_dev
 
 def average_inference(seed, args, shared_list, plot_local = None, rollouts = None, fig_name = None, n_rollouts = None, results_path = None):
     
@@ -423,6 +459,8 @@ def average_inference(seed, args, shared_list, plot_local = None, rollouts = Non
     safety_voilations = []
     total_press_utilization = []
     emptying_volumes_rollouts = []
+    vol_dev_list = []
+    emptying_actions_list = []
 
     #plot_local = plot_local
     if rollouts:
@@ -436,10 +474,12 @@ def average_inference(seed, args, shared_list, plot_local = None, rollouts = Non
         #set random seed
         np.random.seed(i)
         
+        print("the rollout number is ", i)
+        
         # print agent type and rollout seed
         print(f"Agent type is : {args.agent_type}; Agent's seed is {seed}; and seed for rollout is: {i}")
                 
-        volumes, actions, rewards, t_p1, t_p2 = inference(args=args,
+        volumes, actions, rewards, t_p1, t_p2, _ = inference(args=args,
                                                         log_dir=log_dir,
                                                         deterministic_policy=args.inf_deterministic,
                                                         max_episode_length=600,
@@ -449,7 +489,7 @@ def average_inference(seed, args, shared_list, plot_local = None, rollouts = Non
                                                         fig_name=fig_name,
                                                         results_path = results_path)
         
-        overflow,total_volume_processed_all_bunkers,emptying_volumes  = calculate_overflow(env=env,
+        overflow,total_volume_processed_all_bunkers,emptying_volumes, vol_dev  = calculate_overflow(env=env,
                            volumes=volumes,
                            actions=actions,
                            rewards=rewards,
@@ -479,6 +519,15 @@ def average_inference(seed, args, shared_list, plot_local = None, rollouts = Non
         total_press_utilization.append(sum(t_p1)+sum(t_p2))
         
         emptying_volumes_rollouts.append(emptying_volumes)
+        
+        vol_dev_list.append(vol_dev)
+        
+        #find number unique values of actions in actions and their count
+        unique, counts = np.unique(actions, return_counts=True)
+        #emptying_actions = dict(zip(unique, counts))
+        #emptying_actions_list.append(emptying_actions)        
+        emptying_actions_list.append(counts)
+        
     
     list_original = emptying_volumes_rollouts
 
@@ -514,7 +563,7 @@ def average_inference(seed, args, shared_list, plot_local = None, rollouts = Non
 
     shared_list.append(dict_final)
     
-    return dict_new,  pd.DataFrame(list(shared_list))
+    return dict_new,  pd.DataFrame(list(shared_list)), vol_dev_list, emptying_actions_list
 
 def average_inference_optimal_analytic(seed, args, shared_list, plot_local = None, rollouts = None, fig_name = None, n_rollouts = None, results_path = None):
     """ Perform 15 rollouts using the optimal analytic agent and calculate the average reward, episode length, overflow, etc.
@@ -600,6 +649,8 @@ def average_inference_optimal_analytic(seed, args, shared_list, plot_local = Non
     safety_voilations = []
     total_press_utilization = []
     emptying_volumes_rollouts = []
+    vol_dev_list= []
+    emptying_actions_list = []
 
     model =  optimal_analytic_agent(n_bunkers=env.n_bunkers, env=env)
 
@@ -620,7 +671,7 @@ def average_inference_optimal_analytic(seed, args, shared_list, plot_local = Non
         print(f"Agent type is : {args.agent_type}; Agent's seed is {seed}; and seed for rollout is: {i}")
 
 
-        volumes, actions, rewards, t_p1, t_p2 = inference_optimal_analytic(args=None,
+        volumes, actions, rewards, t_p1, t_p2 , _ = inference_optimal_analytic(args=None,
                                       model_input=model,
                                       deterministic_policy=True,
                                       max_episode_length=600,
@@ -636,7 +687,7 @@ def average_inference_optimal_analytic(seed, args, shared_list, plot_local = Non
         
         rewards = filter_repetition_rewards(rewards, actions)
         
-        overflow, total_volume_processed_all_bunkers,emptying_volumes = calculate_overflow(env=env,
+        overflow, total_volume_processed_all_bunkers,emptying_volumes, vol_dev  = calculate_overflow(env=env,
                            volumes=volumes,
                            actions=actions,
                            rewards=rewards,
@@ -670,6 +721,14 @@ def average_inference_optimal_analytic(seed, args, shared_list, plot_local = Non
         total_press_utilization.append(sum(t_p1)+sum(t_p2))
         
         emptying_volumes_rollouts.append(emptying_volumes)
+        
+        vol_dev_list.append(vol_dev)  
+        
+        #find number unique values of actions in actions and their count
+        unique, counts = np.unique(actions, return_counts=True)
+        #emptying_actions = dict(zip(unique, counts))
+        #emptying_actions_list.append(emptying_actions)        
+        emptying_actions_list.append(counts)
         
         
     list_original = emptying_volumes_rollouts
@@ -708,4 +767,4 @@ def average_inference_optimal_analytic(seed, args, shared_list, plot_local = Non
 
     shared_list.append(dict_final)
     
-    return dict_new,  pd.DataFrame(list(shared_list))
+    return dict_new,  pd.DataFrame(list(shared_list)), vol_dev_list, emptying_actions_list

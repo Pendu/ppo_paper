@@ -96,4 +96,4 @@ def calculate_overflow(env=None, volumes=None, actions=None, rewards=None, seed=
     else:
         overall_percentage = 0
         
-    return overall_percentage, total_volume_processed_all_bunkers, emptying_volumes
+    return overall_percentage, total_volume_processed_all_bunkers, emptying_volumes, percentage_list
