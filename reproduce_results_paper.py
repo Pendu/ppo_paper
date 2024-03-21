@@ -49,8 +49,8 @@ if not os.path.exists(results_path+'df_ppo_allagents.csv'):
     for i in tqdm(range(15)):
         
         emptying_volumes_ppo_volume_criteria, df_ppo_volume_criteria, _, _= average_inference(seed=i , args=args2_ns, shared_list=[], plot_local=False, rollouts=True, n_rollouts=15)
-        emptying_volumes_ppo, df_ppo,_ ; _ = average_inference(seed=i, args=args3_ns, shared_list=[], plot_local=False, rollouts=True, n_rollouts=15) #seed 7 has least press utilization and seed 9 has least overflow
-        emptying_volume_optimal_analytic, df_optimal_analytic,_; _= average_inference_optimal_analytic(seed=i, args=args4_ns, shared_list=[], plot_local=False, rollouts=True, n_rollouts=15)
+        emptying_volumes_ppo, df_ppo,_ ,_ = average_inference(seed=i, args=args3_ns, shared_list=[], plot_local=False, rollouts=True, n_rollouts=15) #seed 7 has least press utilization and seed 9 has least overflow
+        emptying_volume_optimal_analytic, df_optimal_analytic,_, _= average_inference_optimal_analytic(seed=i, args=args4_ns, shared_list=[], plot_local=False, rollouts=True, n_rollouts=15)
         
         #append the emptying volumes and dataframes to the lists
         emptying_volumes_ppo_volume_criteria_list.append(emptying_volumes_ppo_volume_criteria)
@@ -139,7 +139,7 @@ if not os.path.exists(results_path+'Inference of Baseline PPO agent on test envi
 
     # plot infercence graphs for best agents                        
     _ , _, _,_= average_inference(seed=ppo_volume_criteria_best_seed , args=args2_ns,shared_list=[], plot_local=True, rollouts=False, fig_name="Inference of PPO-volume criteria on test environment",n_rollouts=1, results_path=results_path) 
-    _ , _ , _;_ = average_inference(seed=ppo_best_seed , args=args3_ns, shared_list=[], plot_local=True, rollouts=False, fig_name="Inference of PPO-CL agent on test environment",n_rollouts=1, results_path=results_path)
+    _ , _ , _,_ = average_inference(seed=ppo_best_seed , args=args3_ns, shared_list=[], plot_local=True, rollouts=False, fig_name="Inference of PPO-CL agent on test environment",n_rollouts=1, results_path=results_path)
     _ , _ , _,_ = average_inference_optimal_analytic(seed=optimal_analytic_best_seed, args=args4_ns, shared_list=[], plot_local=True, rollouts=False, fig_name="Inference of Optical Analytic agent on test environment",n_rollouts=1, results_path=results_path)
 else:
     print("Inference graphs for best agents already saved locally")
@@ -297,7 +297,6 @@ else:
     emptying_actions_optimal_analytic_average = pd.read_csv(results_path+'emptying_actions_optimal_analytic_average.csv')
     
 
-print(emptying_actions_PPO_volcriteria_average)
 
 
 
