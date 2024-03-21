@@ -8,7 +8,7 @@
 ## 🖊 Info
 ### Example render of the environment during evaluation
 <p align="center">
-<img src= "https://gitlab.com/anonymousppocl1/ppo_paper/-/blob/main/example.gif?ref_type=heads" width="80%" height="80%"/>
+<img src= "https://gitlab.com/anonymousppocl1/ppo_paper/-/raw/main/example.gif" width="80%" height="80%"/>
 </p>
 
 ## 📚 Setup
@@ -39,6 +39,3 @@ pip install -r requirements.txt
 python reproduce_results_paper.py
 ```
 
-## 🎭 Support and Contributions
-
-Feel free to ask questions. Posting in [Github Issues]( https://github.com/Pendu/ContainerGym_Prefinal/issues) and PRs are also welcome.
