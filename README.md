@@ -20,13 +20,6 @@
 
 ## 🤖 Installation
 
-Clone the repository and run the following.
-
-```{bash}
-git clone https://github.com/Pendu/ppo_paper_draft.git
-cd ppo_paper_draft
-```
-
 Create a conda virtual environment and run the following commands
 
 ```{bash}
