@@ -68,7 +68,7 @@ class SutcoEnv(gym.Env):
         }  # Duration in sec.
 
 
-        if self.CL_step in [1, 1.5, 2, 3]:
+        if self.CL_step in [1, 2, 3]:
             self.state["Volumes"] = np.array([
                                            np.random.uniform(19,24.5,1)[0], #c1-20
                                            np.random.uniform(19,24.5,1)[0], #c1-30
@@ -131,7 +131,7 @@ class SutcoEnv(gym.Env):
         if number_of_presses == 2:
             self.action_space = spaces.Discrete(self.n_bunkers + 1)  # (2 * self.n_bunkers + 1)
             
-        if self.CL_step in [1,1.5, 2, 3]:
+        if self.CL_step in [1, 2, 3]:
             self.timestep = 30  # Time step in seconds
         elif self.CL_step in [4, 5, 6,7]:
             self.timestep = 60  # Time step in seconds
@@ -233,7 +233,7 @@ class SutcoEnv(gym.Env):
             if self.times["Time presses will be free"][0] == 0 and self.bunker_ids[action-1][0] in self.bunkers_press_1: 
 
                 # check if press-1 is free and if the bunker is press-1 compatible
-                if self.CL_step in [1, 1.5, 2, 3]:
+                if self.CL_step in [1, 2, 3]:
                     t_pressing_ends = timedelta(0) 
                 elif self.CL_step in [4, 5, 6,7]:
                     t_pressing_ends = Absolute_time_Press_1(timedelta(0),
@@ -264,7 +264,7 @@ class SutcoEnv(gym.Env):
 
             elif self.times["Time presses will be free"][1] == 0 and self.bunker_ids[action-1][0] in self.bunkers_press_2: 
 
-                if self.CL_step in [1,1.5, 2, 3]:
+                if self.CL_step in [1,2, 3]:
 
                     res_press_2 = (0, 0, 0)
                 elif self.CL_step in [4, 5, 6,7]:
@@ -332,7 +332,6 @@ class SutcoEnv(gym.Env):
         max_vols = self.bunkers_meta_data.loc[self.bunkers_meta_data["bunker"].isin(np.array(self.bunker_ids)
                                                                                     [:, 1])]["Vol_max"].values
 
-        
         episode_termination_reward = 0
         # Check if episode is done
         if len(np.where(self.state["Volumes"] > max_vols)[0]) > 0 or self.episode_length == self.max_episode_length:
@@ -376,12 +375,7 @@ class SutcoEnv(gym.Env):
                 xyz = freward(a, old_volumes[i], press_is_free, self.bunker_ids[i][0], self.use_minr)
                 self.state["reward"][i] = xyz
                 reward += xyz
-                
-        #         if action>0:
-        #             reward = reward - 0.1 #penalize every successful action to reduce the number of actions
-                    
-        # # # Add episode termination reward to the reward
-        # reward = reward + episode_termination_reward # 
+            
                 
                 
         def get_bonus(old_volumes, ideal_vol, xyz):
@@ -417,7 +411,6 @@ class SutcoEnv(gym.Env):
             return bonus
         
         
-        #if self.CL_step in [100]: 
         if self.CL_step in [1]: 
 
             action_reward = 0  # action reward (only for bunker being emptied, else zero). happens each and every time step of an episode
@@ -460,9 +453,7 @@ class SutcoEnv(gym.Env):
             reward = (episode_termination_reward + action_and_postional_reward)/51 - neg_mul*factor
             
             
-        #if self.CL_step in [1.5]:
-        if self.CL_step in [1.5,2,4,5]:
-        #if self.CL_step in [1.5,2,4,5,6]:
+        if self.CL_step in [2]:
 
             reward = 0
             ideal_vol = self.peak_rew_vols[self.bunker_ids[action-1][0]][-1]
@@ -480,9 +471,7 @@ class SutcoEnv(gym.Env):
                     reward = reward - 0.1 #penalize every successful action to reduce the number of actions
                     
 
-        ## Simple reward function for CL_step 3,4,5 . also use this for rule based agent. 
         if self.CL_step in [3, 4, 5]:
-        #if self.CL_step in [6]:
 
             ideal_vol = self.peak_rew_vols[self.bunker_ids[action-1][0]][-1]
 
@@ -521,8 +510,7 @@ class SutcoEnv(gym.Env):
 
                 reward = reward + press_penalty
                 
-        if self.CL_step in [7]: #also use this for rule based agent. 
-
+        if self.CL_step in [7]: 
             ideal_vol = self.peak_rew_vols[self.bunker_ids[action-1][0]][-1]
 
             reward = 0
@@ -540,28 +528,6 @@ class SutcoEnv(gym.Env):
                     reward = 0
 
                 reward = reward
-            
-
-
-        # remove 6 from above and add 6 here when you want to test the press penalty
-        # if self.CL_step in [6]:
-
-        #     reward = 0
-        #     press_penalty = 0
-
-        #     if action: 
-        #         if old_volumes[action-1] == 0. or self.times["Time presses will be free"][0] != 0. or self.times["Time presses will be free"][1] != 0.:
-        #             press_penalty = -0.1
-        #     else:
-        #         press_penalty = 0.0
-
-        #     reward = press_penalty
-
-        
-            
-        # print(f'reward is {reward}')
-
-        # reward = reward + termination_rew
 
         # Verbose Logging
         info = {}
@@ -578,9 +544,7 @@ class SutcoEnv(gym.Env):
         terminated = done
         
         truncated = False
-        
-        #return  self.state, reward, terminated, truncated, info
-        
+                
         return (
             self.state,
             reward,
@@ -593,27 +557,8 @@ class SutcoEnv(gym.Env):
         super().reset(seed=seed, options=options)
 
 
-        if self.CL_step in [1, 1.5, 2, 3, 4]:
+        if self.CL_step in [1, 2, 3, 4, 5]:
             self.state["Volumes"] = np.array([
-                                            np.random.uniform(0,24.5,1)[0], #c1-20
-                                            np.random.uniform(0,24.5,1)[0], #c1-30
-                                            np.random.uniform(0, 6.5, 1)[0], #c1-40
-                                            np.random.uniform(0,13,1)[0], #c1-60
-                                            np.random.uniform(0,24,1)[0], #c1-70
-                                            np.random.uniform(0,23,1)[0],#c1-80
-                                            np.random.uniform(0, 26, 1)[0],# c2-10
-                                            np.random.uniform(0, 30.5, 1)[0],  # c2-20
-                                            np.random.uniform(0, 10, 1)[0],  # c2-60
-                                            np.random.uniform(0, 15.5,1)[0],  # c2-70
-                                            np.random.uniform(0, 26, 1)[0],  # c2-80
-
-                                            ])
-        elif self.CL_step in [5]:
-
-            #self.state["Volumes"] = np.zeros(self.n_bunkers)# don't do random here try to start from a particular far away value
-
-
-            self.state["Volumes"]= np.array([
                                             np.random.uniform(0,24.5,1)[0], #c1-20
                                             np.random.uniform(0,24.5,1)[0], #c1-30
                                             np.random.uniform(0, 6.5, 1)[0], #c1-40
@@ -637,10 +582,7 @@ class SutcoEnv(gym.Env):
         self.state["Bunkers being emptied"] = np.zeros(self.n_bunkers)
         self.times["Time emptying ends"] = np.array(self.n_bunkers * [0.])
         self.state["reward"] = np.random.uniform(0, 0, size=self.n_bunkers)
-        #self.state["press_is_free"] = np.zeros(1)  # np.array([0])
-        self.state[
-            "peak vol"] = self.peak_rew_vols_current  # np.array([26.75,10,15,20,32]) #np.array([26.75,10,15]) #np.array([26.75,26.75,26.75]) # np.array([26.75,10,15])
-        # self.state["ideal rew"] = np.array([175])
+        self.state["peak vol"] = self.peak_rew_vols_current  
 
         # Reset episode length
         self.episode_length = 0
@@ -659,16 +601,36 @@ class SutcoEnv(gym.Env):
 
 
     def render(self):
-        # Implement Visualization
         pass
 
 
     def action_masks(self):
         """
-        Generates a binary mask indicating the possible actions for the current state.
+        Generates a binary mask indicating the possible actions for the current state based on the number of presses and their availability.
 
-        Returns:
-            np.array: Binary mask indicating the possible actions. Each element represents whether the corresponding action is possible (True) or not (False).
+        This method checks the compatibility of each bunker with the available presses and generates a binary mask where each element represents whether the corresponding action is possible (True) or not (False). The first element of the mask is always True, indicating that the action of doing nothing is always possible.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        np.array
+            A binary mask indicating the possible actions. Each element represents whether the corresponding action is possible (True) or not (False).
+
+        Notes
+        -----
+        The method considers the following scenarios:
+        - If there is only one press, all actions are initially considered possible.
+        - If there are two presses, the method checks if each bunker is compatible with the available presses based on the current state and updates the mask accordingly.
+        - Certain bunkers may not be emptied if a specific press is busy, which is also reflected in the mask.
+
+        Examples
+        --------
+        >>> env = SutcoEnv(...)
+        >>> env.action_masks()
+        array([ True, False, True, ..., False])
         """
         
         # Initialize the press actions to a default of fault
