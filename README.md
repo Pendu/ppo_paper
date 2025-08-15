@@ -8,7 +8,7 @@
 ## 🖊 Info
 ### Example render of the environment during evaluation
 <p align="center">
-<img src= "https://gitlab.com/anonymousppocl1/ppo_paper/-/raw/main/example.gif" width="80%" height="80%"/>
+<img src= "https://github.com/Pendu/ppo_paper/blob/398382bdab09ea86da24b35862292a289377c1c6/example.gif" width="80%" height="80%"/>
 </p>
 
 ## 📚 Setup
